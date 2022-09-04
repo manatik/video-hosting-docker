@@ -1,0 +1,6 @@
+[submodule "packages/backend"]
+	path = packages/backend
+	url = git@github.com:manatik/video-hosting-backend.git
+[submodule "packages/frontend"]
+	path = packages/frontend
+	url = git@github.com:manatik/video-hosting-frontend.git

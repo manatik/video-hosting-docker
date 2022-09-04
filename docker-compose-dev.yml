@@ -1,0 +1,67 @@
+version: "3.10"
+
+x-node-version: &node-version node:16.15.0
+
+services:
+  db:
+    build: ./postgres
+    environment:
+      - POSTGRES_DB=rutube-v1
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+    ports:
+      - "55432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - pgsql-sock:/var/run/postgresql
+    networks:
+      - web
+    logging:
+      driver: none
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: *node-version
+    container_name: rutube-nestjs
+    ports:
+      - "4200:4200"
+    networks:
+      - web
+    depends_on:
+      - db
+    volumes:
+      - ./packages/backend:/backend
+      - pgsql-sock:/var/run/postgresql
+    working_dir: /backend
+    command: bash -c "
+      yarn install
+      && yarn start:dev"
+
+  frontend:
+    image: *node-version
+    container_name: rutube-nextjs
+    ports:
+      - "3000:3000"
+    networks:
+      - web
+    depends_on:
+      - backend
+    volumes:
+      - ./packages/frontend:/frontend
+    working_dir: /frontend
+    command: bash -c "
+      yarn install
+      && yarn dev"
+
+volumes:
+  pgdata:
+  pgsql-sock:
+  cache:
+    driver: local
+
+networks:
+    web:
