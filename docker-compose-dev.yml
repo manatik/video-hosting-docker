@@ -4,7 +4,7 @@ x-node-version: &node-version node:16.15.0
 
 services:
   db:
-    build: ./postgres
+    image: postgres:14.5
     environment:
       - POSTGRES_DB=rutube-v1
       - POSTGRES_USER=postgres
